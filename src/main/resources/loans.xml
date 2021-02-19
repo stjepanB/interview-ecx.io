@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<loans>
+    <loan id="asdasd21321">
+        <user>Stipe</user>
+        <book_id>bk101</book_id>
+        <start_date>2021-02-25</start_date>
+        <end_date>2021-01-25</end_date>
+    </loan>
+</loans>

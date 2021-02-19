@@ -2,7 +2,7 @@ package interview.repositories;
 
 import interview.InterviewApplication;
 import interview.models.Book;
-import interview.repositories.impl.XmlBookRepository;
+import interview.repositories.impl.BookXmlRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @SpringBootTest(classes = InterviewApplication.class)
@@ -25,7 +24,7 @@ public class BookRepositoryTest {
 
     @BeforeEach
     void setUp(@Value("${test.xml.books}") String fileLocation) {
-        bookRepository = new XmlBookRepository(fileLocation);
+        bookRepository = new BookXmlRepository(fileLocation);
         this.books = bookRepository.findAll();
         this.first = bookRepository.findById("bk101");
     }
