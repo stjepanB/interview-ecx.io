@@ -1,10 +1,12 @@
 package interview.repositories.impl;
 
+import interview.models.Book;
 import interview.models.Catalog;
 import interview.models.Loan;
 import interview.models.Loans;
 import interview.repositories.LoanRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -16,15 +18,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Repository
 public class LoanXmlRepository implements LoanRepository {
 
     private final String fileLocation;
     private List<Loan> loans;
 
-    public LoanXmlRepository(@Value("${xml.loan}") String fileLocation) {
+    public LoanXmlRepository(@Value("${xml.loans}") String fileLocation) {
         this.fileLocation = fileLocation;
         prepare();
     }
@@ -59,6 +64,29 @@ public class LoanXmlRepository implements LoanRepository {
     public boolean delete(Loan loan) {
         this.loans.remove(loan);
         return persist(new Loans(this.loans));
+    }
+
+    @Override
+    public List<Loan> findLoansByEndDateAfter(LocalDate endDate) {
+
+        return this.loans.stream()
+                .filter(e -> e.getEndLocalDate().isAfter(endDate))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Loan> findLoansByReturned(boolean returned) {
+        return this.loans.stream()
+                .filter(e -> e.isReturned() == returned)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Loan findActiveLoanForBook(Book book) {
+        return this.loans.stream()
+                .filter(e -> !e.isReturned())
+                .filter(e -> e.getBook_id().equals(book.getId()))
+                .findFirst().orElse(null);
     }
 
     private void prepare() {

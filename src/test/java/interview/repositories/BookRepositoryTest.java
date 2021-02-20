@@ -24,7 +24,7 @@ public class BookRepositoryTest {
     private Book first;
 
     @BeforeEach
-    void setUp(@Value("${test.xml.books}") String fileLocation, @Value("${util.stop.word}") String stopWordLocation) {
+    void setUp(@Value("${test.xml.books}") String fileLocation, @Value("${util.stop.words}") String stopWordLocation) {
         bookRepository = new BookXmlRepository(fileLocation, 0.05F, stopWordLocation);
         this.books = bookRepository.findAll();
         this.first = bookRepository.findById("bk101");
@@ -41,7 +41,7 @@ public class BookRepositoryTest {
     public void firstBook_isInList() {
         var book = books.stream()
                 .filter(e -> e.getId().equals("bk101"))
-                .findFirst().get();
+                .findFirst().orElse(null);
         Assertions.assertNotNull(book);
     }
 

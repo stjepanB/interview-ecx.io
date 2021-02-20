@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlType;
 import java.time.LocalDate;
 
 @XmlRootElement(name = "loan")
-@XmlType(propOrder = {"user", "book_id", "start_date", "end_date"})
+@XmlType(propOrder = {"user", "book_id", "start_date", "end_date", "returned"})
 public class Loan {
 
     private String id;
@@ -15,7 +15,7 @@ public class Loan {
     private String end_date;
     private String user;
     private String book_id;
-
+    private boolean returned;
 
     public String getStart_date() {
         return start_date;
@@ -60,6 +60,15 @@ public class Loan {
     @XmlAttribute
     public void setId(String id) {
         this.id = id;
+    }
+
+    @XmlElement(name = "returned")
+    public boolean isReturned() {
+        return returned;
+    }
+
+    public void setReturned(boolean returned) {
+        this.returned = returned;
     }
 
     public LocalDate getStartLocalDate() {

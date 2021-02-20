@@ -4,6 +4,7 @@ import interview.models.Book;
 import interview.models.Catalog;
 import interview.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Repository
 public class BookXmlRepository implements BookRepository {
 
     private final float SIMILARITY;
@@ -26,7 +28,7 @@ public class BookXmlRepository implements BookRepository {
     private List<Book> books;
     private List<String> stopWords;
 
-    public BookXmlRepository(@Value("${xml.book}") String fileLocation,
+    public BookXmlRepository(@Value("${xml.books}") String fileLocation,
                              @Value("${util.book.similarity}") Float similarity,
                              @Value("${util.stop.words}") String stopWordsLocation) {
         this.fileLocation = fileLocation;
