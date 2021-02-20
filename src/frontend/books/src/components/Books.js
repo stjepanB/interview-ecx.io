@@ -19,14 +19,7 @@ const useStyles = makeStyles({
         background: "darkBlue"
     }
 });
-function createData(id, title, author, genre, price, publish_date, user) {
-    return { id, title, author, genre, price, publish_date, user };
-}
 
-const rows = [
-    createData('bk107', 'Splish Splash', 'Thurman, Paula', 'Romance', '4.95', '2000-11-02'),
-    createData('bk106', 'Lover Birds', 'Randall, Cynthia', 'Romance', '4.95', '2000-09-02', 'Miroslav Joškić')
-];
 
 export default function Books() {
     const classes = useStyles();

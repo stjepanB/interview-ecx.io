@@ -5,8 +5,8 @@ import { getAvailableBooks } from "../api/booksApi"
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+    MuiPickersUtilsProvider,
+    KeyboardDatePicker,
 } from '@material-ui/pickers';
 
 const useStyles = makeStyles({
@@ -24,6 +24,7 @@ export default function Filter() {
     const [open, setOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState('start')
     const [query, setQuery] = useState("");
+    const [selectedDate, setSelectedDate] = useState(new Date('2014-08-18T21:11:54'));
 
     useEffect(() => {
         async function fetch() {
@@ -31,9 +32,11 @@ export default function Filter() {
             setRows(tmp);
         }
         fetch();
-    }, [])
+    }, []);
 
-
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+    }
     const handleClose = () => {
         setOpen(false);
         setRow(undefined)
@@ -42,6 +45,18 @@ export default function Filter() {
     const handleOpen = (row) => {
         setOpen(true);
         setRow(row);
+    }
+    const handleSearch = ()=> {
+
+        if(selectedItem == 'author'){
+                //API call for search
+        }else if(selectedItem == 'description'){
+
+        }else if( selectedItem == 'title'){
+
+        }else if(selectedItem == 'publish_date'){
+
+        }
     }
 
     const getQueryType = (type) => {
@@ -64,17 +79,21 @@ export default function Filter() {
                                     'aria-label': 'change date',
                                 }}
                             />
+                            <Grid item>
+                                <Button color="primary" onClick={handleSearch}> Search</Button>
+                            </Grid>
                         </Grid>
                     </MuiPickersUtilsProvider>
                 </div>
-
             )
         }
 
         return (
             <div>
-                <TextField label={selectedItem} />
-                <Button color="primary"> Search</Button>
+                <Grid container justify="space-around">
+                    <TextField multiline={type == 'description'} label={selectedItem} />
+                    <Button color="primary" onClick={handleSearch}>Search</Button>
+                </Grid>
             </div>
         )
     }
@@ -116,7 +135,6 @@ export default function Filter() {
                                     label="Description"
                                     labelPlacement="start"
                                 />
-
                                 <FormControlLabel
                                     value="top"
                                     control={<Radio
@@ -150,13 +168,12 @@ export default function Filter() {
                                 <TableBody>
                                     {rows.map((row) => (
                                         <TableRow key={row.book_id}>
-
                                             <TableCell>{row.title}</TableCell>
                                             <TableCell>{row.author}</TableCell>
                                             <TableCell>{row.genre}</TableCell>
                                             <TableCell>{row.price}</TableCell>
                                             <TableCell>{row.publish_date}</TableCell>
-                                            <TableCell>{row.user ? row.user : <Button contained onClick={() => handleOpen(row)}>Borrow</Button>}</TableCell>
+                                            <TableCell>{row.user ? row.user : <Button variant="contained" onClick={() => handleOpen(row)}>Borrow</Button>}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -164,14 +181,12 @@ export default function Filter() {
                         </TableContainer>
                     </Grid>
                 </Grid>
-
             </Paper>
             <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="simple-modal-title"
                 aria-describedby="simple-modal-description"
-
             >
                 <Paper>
                     <h2 id="modal-title">
@@ -188,7 +203,6 @@ export default function Filter() {
                                     rows={4}
                                     label={row ? row.description : "none"}
                                 />
-
                             </Grid>
                             <Grid item >
                                 <TextField required id="outlined-basic" label="User name" variant="outlined" />
@@ -197,12 +211,8 @@ export default function Filter() {
                                 <Button type="submit" primary> Borrow </Button>
                             </Grid>
                         </Grid>
-
                     </form>
-
-
                 </Paper>
-
             </Modal>
         </div>
     )
