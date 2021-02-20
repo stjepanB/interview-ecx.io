@@ -13,6 +13,14 @@ public class Loans {
     @XmlElement(name = "loan")
     private List<Loan> loans;
 
+    public Loans() {
+
+    }
+
+    public Loans(List<Loan> loans) {
+        this.loans = loans;
+    }
+
     public List<Loan> getLoans() {
         return loans;
     }

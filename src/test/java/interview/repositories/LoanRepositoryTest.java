@@ -5,10 +5,7 @@ import interview.models.Book;
 import interview.models.Loan;
 import interview.repositories.impl.BookXmlRepository;
 import interview.repositories.impl.LoanXmlRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,15 +29,29 @@ public class LoanRepositoryTest {
 
     @Test
     @DisplayName("Save loan.")
-    public void saveLoan(){
+    public void saveLoan() {
         Loan l = new Loan();
         l.setBook_id("bk101");
-        l.setEnd_date(LocalDate.of(2021,1,25).toString());
-        l.setStart_date(LocalDate.of(2021,2,25).toString());
+        l.setStart_date(LocalDate.of(2021, 1, 25).toString());
+        l.setEnd_date(LocalDate.of(2021, 2, 25).toString());
         l.setUser("Stipe");
         l.setId("asdasd21321");
         loanRepository.save(l);
 
         Assertions.assertNotNull(loanRepository.findById("asdasd21321"));
+    }
+
+    @Test
+    @DisplayName("Get loan by id")
+    public void findLoanById_test() {
+        Loan l = loanRepository.findById("ln2234");
+        Assertions.assertNotNull(l);
+    }
+
+
+    @AfterEach
+    void cleanUp() {
+        Loan l = loanRepository.findById("asdasd21321");
+        loanRepository.delete(l);
     }
 }

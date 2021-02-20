@@ -11,4 +11,6 @@ public interface LoanRepository {
     Loan save(Loan loan);
 
     Loan findById(String id);
+
+    boolean delete(Loan loan);
 }

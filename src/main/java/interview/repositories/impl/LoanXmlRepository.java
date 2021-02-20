@@ -13,7 +13,6 @@ import javax.xml.bind.Unmarshaller;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +21,7 @@ import java.util.List;
 
 public class LoanXmlRepository implements LoanRepository {
 
-    private String fileLocation;
+    private final String fileLocation;
     private List<Loan> loans;
 
     public LoanXmlRepository(@Value("${xml.loan}") String fileLocation) {
@@ -56,6 +55,12 @@ public class LoanXmlRepository implements LoanRepository {
                 .orElse(null);
     }
 
+    @Override
+    public boolean delete(Loan loan) {
+        this.loans.remove(loan);
+        return persist(new Loans(this.loans));
+    }
+
     private void prepare() {
         Path path = Paths.get(fileLocation);
 
@@ -73,7 +78,6 @@ public class LoanXmlRepository implements LoanRepository {
 
             JAXBContext jaxbContext = JAXBContext.newInstance(Loans.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
             this.loans = ((Loans) jaxbUnmarshaller.unmarshal(
                     new FileInputStream(fileLocation)))
                     .getLoans();
@@ -81,7 +85,7 @@ public class LoanXmlRepository implements LoanRepository {
             e.printStackTrace();
         }
 
-        if(this.loans == null){
+        if (this.loans == null) {
             this.loans = new ArrayList<>();
         }
     }
@@ -92,7 +96,6 @@ public class LoanXmlRepository implements LoanRepository {
             JAXBContext jaxbContext = JAXBContext.newInstance(Loans.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.marshal(loans, new FileOutputStream(fileLocation));
-
         } catch (JAXBException | IOException e) {
             e.printStackTrace();
             return false;
