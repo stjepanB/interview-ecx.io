@@ -20,4 +20,6 @@ public interface BookService {
 
     List<BookForm> getAvailableBooksByPublishDate(LocalDate publishDate);
 
+    List<BookForm> getAvailableBooksByTitle(String title);
+
 }

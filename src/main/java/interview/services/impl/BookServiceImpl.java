@@ -51,6 +51,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookForm> getAvailableBooks() {
         List<Book> books = bookRepository.findAll();
+
         return books.stream()
                 .map(e -> BookForm.createFormBook(e, loanRepository.findActiveLoanForBook(e)))
                 .filter(e -> e.getLoan() == null)
@@ -91,6 +92,15 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookForm> getAvailableBooksByPublishDate(LocalDate publishDate) {
         List<Book> books = bookRepository.findByPublishedDate(publishDate);
+        return books.stream()
+                .map(e -> BookForm.createFormBook(e, loanRepository.findActiveLoanForBook(e)))
+                .filter(e -> e.getLoan() == null)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookForm> getAvailableBooksByTitle(String title) {
+        List<Book> books = bookRepository.findByTitle(title);
         return books.stream()
                 .map(e -> BookForm.createFormBook(e, loanRepository.findActiveLoanForBook(e)))
                 .filter(e -> e.getLoan() == null)

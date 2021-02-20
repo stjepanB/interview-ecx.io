@@ -120,8 +120,12 @@ public class BookForm {
         b.setTitle(this.title);
         return b;
     }
+
     @JsonIgnore
     public Loan getLoan() {
+        if(this.user == null){
+            return null;
+        }
         Loan l = new Loan();
         l.setBook_id(this.book_id);
         l.setUser(this.user);
