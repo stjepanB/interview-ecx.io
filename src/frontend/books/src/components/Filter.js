@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Paper, FormControlLabel, Radio, TableBody, RadioGroup, FormControl, TableContainer, Modal, TextField, Button, TableCell, Table, TableRow, TableHead } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { getAvailableBooks } from "../api/booksApi"
+import { getAvailableBooks, borrowBook, getBooksByAuthor, getBooksByDescription, getBooksByTitle } from "../api/booksApi"
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import {
@@ -25,6 +25,8 @@ export default function Filter() {
     const [selectedItem, setSelectedItem] = useState('start')
     const [query, setQuery] = useState("");
     const [selectedDate, setSelectedDate] = useState(new Date('2014-08-18T21:11:54'));
+    const [user, setUser] = useState(undefined);
+    const [callAPI, setCallAPI] = useState(0)
 
     useEffect(() => {
         async function fetch() {
@@ -33,6 +35,39 @@ export default function Filter() {
         }
         fetch();
     }, []);
+
+    useEffect(() => {
+        if (callAPI == 0) {
+            return
+        }
+        let fetch;
+        if (selectedItem == 'author') {
+            fetch = async () => {
+                const response = await getBooksByAuthor(query);
+                const data = await response.json;
+                if(data === undefined){
+                    console.log("Data is undefined")
+                }
+               return data
+            }
+        } else if (selectedItem == 'description') {
+            fetch = async () => {
+                const response = await getBooksByDescription(query);
+                const data = await response.data;
+                return data
+            }
+        } else if (selectedItem == 'title') {
+            fetch = async () => {
+                const response = await getBooksByTitle(query);
+                const data = await response.data;
+                return data
+            }
+        } else if (selectedItem == 'publish_date') {
+            console.log("TODO");
+        }
+        fetch().then(d => setRows(d));
+    }, [callAPI])
+
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
@@ -46,17 +81,30 @@ export default function Filter() {
         setOpen(true);
         setRow(row);
     }
-    const handleSearch = ()=> {
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        setCallAPI(callAPI + 1);
+    }
 
-        if(selectedItem == 'author'){
-                //API call for search
-        }else if(selectedItem == 'description'){
+    const handleQuery = (event) => {
+        setQuery(event.target.value);
+    }
 
-        }else if( selectedItem == 'title'){
-
-        }else if(selectedItem == 'publish_date'){
-
+    const createLoan = async function (e) {
+        e.preventDefault();
+        const loan = {
+            "user": user,
+            "book_id": row.book_id
         }
+        const response = await borrowBook(loan);
+
+        if (response !== null) {
+            console.log(response)
+        } else {
+            console.log("Response is NULL!")
+        }
+
+        window.location.reload();
     }
 
     const getQueryType = (type) => {
@@ -80,7 +128,7 @@ export default function Filter() {
                                 }}
                             />
                             <Grid item>
-                                <Button color="primary" onClick={handleSearch}> Search</Button>
+                                <Button color="primary" onClick={handleSearch}>Search</Button>
                             </Grid>
                         </Grid>
                     </MuiPickersUtilsProvider>
@@ -91,7 +139,7 @@ export default function Filter() {
         return (
             <div>
                 <Grid container justify="space-around">
-                    <TextField multiline={type == 'description'} label={selectedItem} />
+                    <TextField multiline={type == 'description'} label={selectedItem} onChange={handleQuery} />
                     <Button color="primary" onClick={handleSearch}>Search</Button>
                 </Grid>
             </div>
@@ -192,7 +240,7 @@ export default function Filter() {
                     <h2 id="modal-title">
                         {row ? row.title : null}
                     </h2>
-                    <form className={classes.root} autoComplete="off">
+                    <form className={classes.root} onSubmit={createLoan} autoComplete="off">
                         <Grid container className={classes.root} spacing={2}>
                             <Grid item>
                                 <TextField
@@ -205,7 +253,11 @@ export default function Filter() {
                                 />
                             </Grid>
                             <Grid item >
-                                <TextField required id="outlined-basic" label="User name" variant="outlined" />
+                                <TextField required id="outlined-basic"
+                                    label="User name"
+                                    variant="outlined"
+                                    onChange={e => setUser(e.target.value)}
+                                />
                             </Grid>
                             <Grid item>
                                 <Button type="submit" primary> Borrow </Button>

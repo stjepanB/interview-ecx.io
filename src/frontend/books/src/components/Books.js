@@ -9,7 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import { Modal, TextField, Grid } from '@material-ui/core';
-import { getBooks } from '../api/booksApi';
+import { getBooks, borrowBook } from '../api/booksApi';
 
 const useStyles = makeStyles({
     table: {
@@ -25,7 +25,8 @@ export default function Books() {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
     const [rows, setRows] = useState([])
-    const [row, setRow] = useState(undefined)
+    const [row, setRow] = useState(undefined);
+    const [user, setUser] = useState(undefined);
 
     useEffect(() => {
         async function fetch() {
@@ -35,7 +36,6 @@ export default function Books() {
         fetch();
     }, [])
 
-
     const handleClose = () => {
         setOpen(false);
         setRow(undefined)
@@ -44,6 +44,23 @@ export default function Books() {
     const handleOpen = (row) => {
         setOpen(true);
         setRow(row);
+    }
+    
+    const createLoan = async function (e) {
+        e.preventDefault();
+        const loan = {
+            "user" : user,
+            "book_id": row.book_id
+        }
+        const response = await borrowBook(loan);
+
+        if (response !== null) {
+            console.log(response)
+        } else {
+            console.log("Response is NULL!")
+        }
+
+        window.location.reload();
     }
 
     return (
@@ -87,7 +104,7 @@ export default function Books() {
                     <h2 id="modal-title">
                         {row ? row.title : null}
                     </h2>
-                    <form className={classes.root} autoComplete="off">
+                    <form className={classes.root} onSubmit={createLoan} autoComplete="off">
                         <Grid container className={classes.root} spacing={2}>
                             <Grid item>
                                 <TextField
@@ -101,7 +118,11 @@ export default function Books() {
 
                             </Grid>
                             <Grid item >
-                                <TextField required id="outlined-basic" label="User name" variant="outlined" />
+                                <TextField required id="outlined-basic"
+                                    label="User name"
+                                    variant="outlined"
+                                    onChange={e => setUser(e.target.value)}
+                                />
                             </Grid>
                             <Grid item>
                                 <Button type="submit" primary> Borrow </Button>

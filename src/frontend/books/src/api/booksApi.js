@@ -27,8 +27,12 @@ export async function getBooksByDescription(description) {
     return response.data
 }
 export async function getBooksByTitle(title) {
-    const response = await axios.get("http://localhost:9000/available?title="+title)
+    const response = await axios.get("http://localhost:9000/available?title=" + title)
     console.log(response)
     console.log(response.data)
     return response.data
+}
+
+export async function borrowBook(loan) {
+    const response = await axios.post("http://localhost:9000/loan", loan)
 }

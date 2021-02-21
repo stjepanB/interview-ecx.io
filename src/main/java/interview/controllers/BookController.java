@@ -1,11 +1,11 @@
 package interview.controllers;
 
 import interview.forms.BookForm;
+import interview.forms.BookLoanForm;
 import interview.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,18 +29,23 @@ public class BookController {
         return bookService.getAvailableBooks();
     }
 
-    @GetMapping(value = "/available")
+    @GetMapping(value = "/available", params = "title")
     public List<BookForm> getAvailableBooksByTitle(@RequestParam String title) {
         return bookService.getAvailableBooksByTitle(title);
     }
 
-    @GetMapping(value = "/available")
+    @GetMapping(value = "/available", params = "author")
     public List<BookForm> getAvailableBooksByAuthor(@RequestParam String author) {
         return bookService.getAvailableBooksByAuthor(author);
     }
 
-    @GetMapping(value = "/available")
+    @GetMapping(value = "/available", params = "description")
     public List<BookForm> getAvailableBooksByDescription(@RequestParam String description) {
         return bookService.getAvailableBooksByDescription(description);
+    }
+
+    @PostMapping(value = "/loan")
+    public HttpStatus saveLoan(@RequestBody BookLoanForm form) {
+        return bookService.checkBook(form) ? HttpStatus.OK : HttpStatus.FORBIDDEN;
     }
 }

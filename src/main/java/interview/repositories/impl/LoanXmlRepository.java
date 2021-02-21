@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Repository
@@ -41,7 +42,7 @@ public class LoanXmlRepository implements LoanRepository {
 
     @Override
     public Loan save(Loan loan) {
-
+        loan.setId(generateLoanId());
         this.loans.add(loan);
         Loans newLoans = new Loans();
         newLoans.setLoans(loans);
@@ -50,6 +51,18 @@ public class LoanXmlRepository implements LoanRepository {
         }
         this.loans.remove(loan);
         return null;
+    }
+    private String generateLoanId() {
+        Random r = new Random();
+        int num = r.nextInt(999999);
+        LocalDate l = LocalDate.now();
+        StringBuilder s = new StringBuilder();
+        s.append("ln")
+                .append(num)
+                .append(l.getDayOfMonth())
+                .append(l.getMonthValue())
+                .append(l.getYear());
+        return s.toString();
     }
 
     @Override

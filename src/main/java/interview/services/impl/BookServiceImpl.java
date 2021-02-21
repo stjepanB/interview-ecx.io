@@ -1,12 +1,14 @@
 package interview.services.impl;
 
 import interview.forms.BookForm;
+import interview.forms.BookLoanForm;
 import interview.models.Book;
 import interview.models.Loan;
 import interview.repositories.BookRepository;
 import interview.repositories.LoanRepository;
 import interview.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,11 +21,23 @@ public class BookServiceImpl implements BookService {
 
     private final LoanRepository loanRepository;
     private final BookRepository bookRepository;
+    private final long NUM_DAYS_LOAN;
 
     @Autowired
-    public BookServiceImpl(LoanRepository loanRepository, BookRepository bookRepository) {
+    public BookServiceImpl(LoanRepository loanRepository,
+                           BookRepository bookRepository,
+                           @Value("${loan.period}") String num_days_loan) {
         this.loanRepository = loanRepository;
         this.bookRepository = bookRepository;
+        NUM_DAYS_LOAN = Long.parseLong(num_days_loan);
+    }
+
+    public BookServiceImpl(LoanRepository loanRepository,
+                           BookRepository bookRepository,
+                           long num_days_loan) {
+        this.loanRepository = loanRepository;
+        this.bookRepository = bookRepository;
+        NUM_DAYS_LOAN = num_days_loan;
     }
 
     @Override
@@ -36,12 +50,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean checkBook(BookForm bookForm) {
-        Loan tmp = loanRepository.findActiveLoanForBook(bookForm.getBook());
+    public boolean checkBook(BookLoanForm bookForm) {
+        Loan tmp = loanRepository.findActiveLoanForBook(bookRepository.findById(bookForm.getBook_id()));
         if (tmp == null) {
-            Loan l = bookForm.getLoan();
-            l.setReturned(false);
-            l.setId(generateLoanId());
+            Loan l = bookForm.getLoan(NUM_DAYS_LOAN);
             Loan saved = loanRepository.save(l);
             return saved != null;
         }
@@ -56,19 +68,6 @@ public class BookServiceImpl implements BookService {
                 .map(e -> BookForm.createFormBook(e, loanRepository.findActiveLoanForBook(e)))
                 .filter(e -> e.getLoan() == null)
                 .collect(Collectors.toList());
-    }
-
-    private String generateLoanId() {
-        Random r = new Random();
-        int num = r.nextInt(999999);
-        LocalDate l = LocalDate.now();
-        StringBuilder s = new StringBuilder();
-        s.append("ln")
-                .append(num)
-                .append(l.getDayOfMonth())
-                .append(l.getMonthValue())
-                .append(l.getYear());
-        return s.toString();
     }
 
     @Override

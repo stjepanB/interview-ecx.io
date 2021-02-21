@@ -1,7 +1,7 @@
 package interview.services;
 
 import interview.InterviewApplication;
-import interview.forms.BookForm;
+import interview.forms.BookLoanForm;
 import interview.models.Book;
 import interview.models.Loan;
 import interview.repositories.BookRepository;
@@ -29,43 +29,55 @@ public class BookServiceTest {
     private BookService bookService;
 
     @MockBean
-    private BookForm bookForm;
+    private BookLoanForm loanForm;
 
-    private Book nullBook;
-    private Book someBook;
+    private Loan newLoan;
+    private Loan existingLoan;
 
     private Loan l;
 
     @BeforeEach
     void setUp() {
-        nullBook = new Book();
-        nullBook.setId("bk123");
-        someBook = new Book();
-        someBook.setId("bk223");
+        newLoan = new Loan();
+        newLoan.setBook_id("bk111");
+        newLoan.setReturned(false);
+        newLoan.setUser("Slavko Miškić");
+        newLoan.setStart_date(LocalDate.now().toString());
+        newLoan.setStart_date(LocalDate.now().plusDays(30L).toString());
 
-        doReturn(nullBook).when(bookForm).getBook();
-        l = new Loan();
-        l.setBook_id("nullBook");
-        l.setStart_date(LocalDate.now().toString());
-        l.setEnd_date(LocalDate.now().toString());
-        doReturn(l).when(bookForm).getLoan();
-        doReturn(null).when(loanRepository).findActiveLoanForBook(nullBook);
-        doReturn(l).when(loanRepository).findActiveLoanForBook(someBook);
-        doReturn(l).when(loanRepository).save(l);
-        bookService = new BookServiceImpl(loanRepository, bookRepository);
+        existingLoan = new Loan();
+        existingLoan.setBook_id("bk223");
+
+
+        Book b_existing = new Book();
+        b_existing.setId("bk223");
+
+        Book b_newLoan = new Book();
+        b_newLoan.setId("bk111");
+
+
+        doReturn(b_existing).when(bookRepository).findById("bk223");
+        doReturn(b_newLoan).when(bookRepository).findById("bk111");
+
+
+        doReturn(null).when(loanRepository).findActiveLoanForBook(b_newLoan);
+        doReturn(existingLoan).when(loanRepository).findActiveLoanForBook(b_existing);
+        doReturn(newLoan).when(loanRepository).save(newLoan);
+        bookService = new BookServiceImpl(loanRepository, bookRepository, 30L);
 
     }
 
     @Test
     @DisplayName("Get false for check book when book is checked")
     public void checkUpTrue_onNewLoanTest() {
-        Assertions.assertTrue(bookService.checkBook(bookForm));
+        doReturn(newLoan).when(loanForm).getLoan(30L);
+        Assertions.assertTrue(bookService.checkBook(loanForm));
     }
 
     @Test
     @DisplayName("Get false for check book when book is checked")
     public void checkUpFalse_onBorrowedBookTest() {
-        doReturn(someBook).when(bookForm).getBook();
-        Assertions.assertFalse(bookService.checkBook(bookForm));
+        doReturn(existingLoan).when(loanForm).getLoan(30L);
+        Assertions.assertFalse(bookService.checkBook(loanForm));
     }
 }
